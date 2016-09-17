@@ -15,6 +15,19 @@ RED = 255, 0, 0
 BLINK_EVENT = pygame.USEREVENT + 0 #For the blinking "insert credits"
 CREDITS_EVENT = pygame.USEREVENT + 1 #doesn't really serve a purpose atm...
 
+#The following is to disable and enable blinking after a click (or whatever action)
+keepBlinking = True
+def changeBlink():
+    global keepBlinking
+    if keepBlinking:
+        keepBlinking = False
+    else:
+        keepBlinking = True
+def getBlink():
+    global keepBlinking
+    return keepBlinking
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT)) #Setting the screen parameters 
@@ -50,7 +63,7 @@ def main():
     off_text_surface = pygame.Surface(blink_rect.size)
     blink_surfaces = cycle([on_text_surface, off_text_surface])
     blink_surface = next(blink_surfaces)
-    pygame.time.set_timer(BLINK_EVENT, 1000)
+    pygame.time.set_timer(BLINK_EVENT, 500)
         
         
     #Blit everything, i.e. makes everything appear
@@ -78,29 +91,39 @@ def main():
                 my_event = pygame.event.Event(CREDITS_EVENT, message="credits inserted")
                 pygame.event.post(my_event)
         except:
-            pass #can't think of anything better for now
+            pass #can't think of anything better, ayy lmao
             #my_event = pygame.event.Event(BLINK_EVENT, message="idk!")
             #pygame.event.post(my_event) #is this even necessary...nobody knowsss
 
-        
+
+    
     while running: 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            #if event.type == pygame.MOUSEBUTTONUP: #this is just 4 funzies 
-             #   pos = pygame.mouse.get_pos()
-              #  screen.blit(off_text_surface, blink_rect)
-               # print("Your mouse position is " + str(pos))
-            if event.type == BLINK_EVENT: 
-                 blink_surface = next(blink_surfaces)
-                 screen.blit(blink_surface, blink_rect)
+            if event.type == pygame.MOUSEBUTTONUP: #this is all for shits and giggles 
+                screen.fill(pygame.Color("black"))
+                on_text_surface = font.render('Thanks for paying up, CHUMP!', 1, pygame.Color("black"))
+                changeBlink() #By clicking multiple times, one can toggle blinking on and off
+                #gamePlay(), this should start the actual game
+            if event.type == BLINK_EVENT:
+                if getBlink():
+                    blink_surface = next(blink_surfaces)
+                    screen.blit(blink_surface, blink_rect)
+                else:
+                    pass
+                
             if event.type == CREDITS_EVENT: #dont think we rlly need this
                 print("yay credits")
             #if event.type == GAMEOVER_EVENT:
                 #pass #Game over, display high scores?
             #if event.type == RESTART_EVENT:
-                #pass #Somehow loop back to the start screen
+            if event.type == pygame.KEYDOWN: #pressing R restarts the process
+                if event.key == pygame.K_r: #Can change to whatever condition
+                    if getBlink() == False:
+                        changeBlink()
+                    main()
         pygame.display.update()
         clock.tick(60)
 
