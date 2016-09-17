@@ -1,4 +1,5 @@
 const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
+
 int sensorValue = 1023;        // value read from the pot
 
 void setup() {
@@ -11,7 +12,7 @@ void loop() {
   
   sensorValue = analogRead(analogInPin);
 
-  if(sensorValue != 1023){
-    Serial.print("1");
+  if(sensorValue < 950){
+    Serial.print("1 \n");
   }
 }
