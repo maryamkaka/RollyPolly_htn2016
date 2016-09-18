@@ -17,9 +17,10 @@ HEIGHT = 600
 running = 1 #just to make the while loop look cool 
 
 BLINK_EVENT = pygame.USEREVENT + 0 #For the blinking "insert credits"
+RESET_EVENT = pygame.USEREVENT + 1 
 
 #Keeping track of highscores 
-scores = [46,23,6,87,9,7,57,87,20]
+scores = []
 
 #The following is to disable and enable blinking after a click (or whatever action)
 keepBlinking = True
@@ -34,8 +35,8 @@ def getBlink():
     return keepBlinking
 
 def gameplay():
-    print("at gameplay!")
     scoreValue = 0
+    count = 0
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT)) #Setting the screen parameters 
     screen_rect = screen.get_rect()
@@ -59,15 +60,18 @@ def gameplay():
     scorepos = scoreNum.get_rect(center=(0, (HEIGHT/2)))
     scorepos.centerx = background.get_rect().centerx
 
-    #circle_rect = Rect(410, 200, 200, 200)
-    #pygame.draw.ellipse(background, WHITE, circle_rect)
     #Blit everything, i.e. makes everything appear
     background.blit(text1, textpos1)
     background.blit(scoreNum, scorepos)
     screen.blit(background, (0,0))
 
     gameOver = False
+    arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
     while not(gameOver): #as of now, score updates because of time, implementation of scoring to come
+        arduinoRead = arduino.readline()[:-2] #the last bit gets rid of the new-line chars
+        print("arduino says " + str(arduinoRead) + " and it is of type " + str(type(arduinoRead)))
+        if (arduinoRead == "bumper"):
+            scoreValue += 42
         pygame.display.flip()
         screen.fill(BLACK) #"Erases" old score every time to make way for the new one
         text1 = title.render('GAME TIME!', 1, RED)
@@ -76,28 +80,32 @@ def gameplay():
         scorepos.centerx = background.get_rect().centerx
         screen.blit(text1, textpos1)
         screen.blit(scoreNum, scorepos)
-        scoreValue+=1
+        
         time.sleep(.1)
         
         #Find a condition for ending the game, for now we'll use this 
-        if scoreValue >= 10:
-            gameOver = True
-            pygame.display.flip()
-            screen.fill(BLACK)
-            text2 = gameover.render('GAME OVER', 1, RED)
-            textpos2 = text2.get_rect(center=(0, (HEIGHT/2)))
-            textpos2.centerx = background.get_rect().centerx
-            maxscore = title.render('Your score: ' + str(scoreValue), 1, WHITE)
-            maxscorepos = maxscore.get_rect(center=(0, (HEIGHT/2 + 70)))
-            maxscorepos.centerx = background.get_rect().centerx
-            screen.blit(text2, textpos2)
-            screen.blit(maxscore, maxscorepos)
-        
-    #What will be written here is how the program will deal with the raspberry pi
-    #i.e. how points will be assigned based on sensor values and whatnot
-    #store the point stuff in a variable and increment it once in a while
-    #perhaps implement another method in order to keep track of points and stuff and loop
-    #dunno about  stopping  condition....lol
+        if scoreValue >= 500:
+            while count<2500: #count is employed so that the game over screen remains for a bit
+                scores.append(scoreValue)
+                gameOver = True
+                pygame.display.flip()
+                screen.fill(BLACK)
+                text2 = gameover.render('GAME OVER', 1, RED)
+                textpos2 = text2.get_rect(center=(0, (HEIGHT/2)))
+                textpos2.centerx = background.get_rect().centerx
+                userscore = title.render('Your Score: ' + str(scoreValue), 1, WHITE)
+                userscorepos = userscore.get_rect(center=(0, (HEIGHT/2 + 60)))
+                userscorepos.centerx = background.get_rect().centerx
+                maxscore = title.render('The High Score: ' + str(max(scores)), 1, YELLOW)
+                maxscorepos = maxscore.get_rect(center=(0, (HEIGHT/2 + 110)))
+                maxscorepos.centerx = background.get_rect().centerx
+                screen.blit(text2, textpos2)
+                screen.blit(userscore, userscorepos)
+                screen.blit(maxscore, maxscorepos)
+                count += 1
+
+    my_event = pygame.event.Event(RESET_EVENT, message="reset!")
+    pygame.event.post(my_event)
     #how long does gameplay last? how to determine how to get back to the main page?
     #End condition: NO MORE BALLS, add score to highscore list 
 
@@ -105,7 +113,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT)) #Setting the screen parameters 
     screen_rect = screen.get_rect()
-    pygame.display.set_caption('Pinball 4 lyfe') 
+    pygame.display.set_caption('P-Ball 4 lyfe') 
 
     background = pygame.Surface(screen.get_size()) #Filling up the background 
     background = background.convert()
@@ -157,6 +165,8 @@ def main():
                 print("thank you for inserting a coin!") #FOR DEBUGGING PURPOSES
                 waitingForAOne = False
                 #arduino.close() #closing the port
+            time.sleep(1)
+            gameplay()
         except:
             pass #can't think of anything better
     
@@ -176,8 +186,7 @@ def main():
                     screen.blit(blink_surface, blink_rect)
                 else:
                     pass
-            if event.type == pygame.KEYDOWN: #pressing R restarts the process
-                if event.key == pygame.K_r: #Can change to whatever condition
+            if event.type == RESET_EVENT:
                     if getBlink() == False:
                         changeBlink()
                     main()
