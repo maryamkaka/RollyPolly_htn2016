@@ -118,7 +118,7 @@ def gameplay():
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT)) #Setting the screen parameters 
+    screen = pygame.display.set_mode((640,480), pygame.FULLSCREEN) #Setting the screen parameters 
     screen_rect = screen.get_rect()
     pygame.display.set_caption('P-Ball 4 lyfe') 
 
