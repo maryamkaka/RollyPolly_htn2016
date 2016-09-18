@@ -67,11 +67,16 @@ def gameplay():
 
     gameOver = False
     arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
+    points = 0
     while not(gameOver): #as of now, score updates because of time, implementation of scoring to come
         arduinoRead = arduino.readline()[:-2] #the last bit gets rid of the new-line chars
-        print("arduino says " + str(arduinoRead) + " and it is of type " + str(type(arduinoRead)))
-        if (arduinoRead == "bumper"):
-            scoreValue += 42
+        #print("arduino says " + str(arduinoRead) + " and it is of type " + str(type(arduinoRead)))
+        try:
+            points = int(struct.unpack('s', arduinoRead)[0])
+            if points==2:
+                scoreValue += 42
+        except:
+            pass
         pygame.display.flip()
         screen.fill(BLACK) #"Erases" old score every time to make way for the new one
         text1 = title.render('GAME TIME!', 1, RED)
