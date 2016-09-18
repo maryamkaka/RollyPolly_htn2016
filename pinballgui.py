@@ -141,7 +141,7 @@ def main():
     pygame.display.flip()
 
     credit=0
-    arduino = serial.Serial('COM3', 9600, timeout=.1)
+    arduino = serial.Serial('COM1', 9600, timeout=.1)
     while waitingForAOne: #Until we get a 1 value from the arduino, we stay here 5ever
         time.sleep(0.1)
         arduinoRead = arduino.readline()[:-2] #the last bit gets rid of the new-line chars 
