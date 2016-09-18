@@ -90,26 +90,26 @@ def gameplay():
         
         time.sleep(.1)
         
-        #Find a condition for ending the game, for now we'll use this 
-        if gameOver:
-            while count<2500: #count is employed so that the game over screen remains for a bit
-                scores.append(scoreValue)
-                gameOver = True
-                pygame.display.flip()
-                screen.fill(BLACK)
-                text2 = gameover.render('GAME OVER', 1, RED)
-                textpos2 = text2.get_rect(center=(0, (HEIGHT/2)))
-                textpos2.centerx = background.get_rect().centerx
-                userscore = title.render('Your Score: ' + str(scoreValue), 1, WHITE)
-                userscorepos = userscore.get_rect(center=(0, (HEIGHT/2 + 60)))
-                userscorepos.centerx = background.get_rect().centerx
-                maxscore = title.render('The High Score: ' + str(max(scores)), 1, YELLOW)
-                maxscorepos = maxscore.get_rect(center=(0, (HEIGHT/2 + 110)))
-                maxscorepos.centerx = background.get_rect().centerx
-                screen.blit(text2, textpos2)
-                screen.blit(userscore, userscorepos)
-                screen.blit(maxscore, maxscorepos)
-                count += 1
+    #Find a condition for ending the game, for now we'll use this 
+    if gameOver:
+        while count<2500: #count is employed so that the game over screen remains for a bit
+            scores.append(scoreValue)
+            gameOver = True
+            pygame.display.flip()
+            screen.fill(BLACK)
+            text2 = gameover.render('GAME OVER', 1, RED)
+            textpos2 = text2.get_rect(center=(0, (HEIGHT/2)))
+            textpos2.centerx = background.get_rect().centerx
+            userscore = title.render('Your Score: ' + str(scoreValue), 1, WHITE)
+            userscorepos = userscore.get_rect(center=(0, (HEIGHT/2 + 60)))
+            userscorepos.centerx = background.get_rect().centerx
+            maxscore = title.render('The High Score: ' + str(max(scores)), 1, YELLOW)
+            maxscorepos = maxscore.get_rect(center=(0, (HEIGHT/2 + 110)))
+            maxscorepos.centerx = background.get_rect().centerx
+            screen.blit(text2, textpos2)
+            screen.blit(userscore, userscorepos)
+            screen.blit(maxscore, maxscorepos)
+            count += 1
 
     my_event = pygame.event.Event(RESET_EVENT, message="reset!")
     pygame.event.post(my_event)
