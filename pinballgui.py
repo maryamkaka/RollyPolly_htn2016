@@ -172,7 +172,7 @@ def main():
                 print("thank you for inserting a coin!") #FOR DEBUGGING PURPOSES
                 waitingForAOne = False
                 #arduino.close() #closing the port
-            time.sleep(1)
+            time.sleep(3)
             gameplay()
         except:
             pass #can't think of anything better
