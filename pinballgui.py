@@ -73,9 +73,9 @@ def gameplay():
         #print("arduino says " + str(arduinoRead) + " and it is of type " + str(type(arduinoRead)))
         try:
             points = int(struct.unpack('s', arduinoRead)[0])
-            if points==2:
+            if points == 2:
                 scoreValue += 42
-            elif points==1:
+            elif points == 1:
                 gameOver = True
         except:
             pass
@@ -182,6 +182,10 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
             if event.type == pygame.MOUSEBUTTONUP: #this is all for shits and giggles 
                 screen.fill(pygame.Color("black"))
                 on_text_surface = font.render('Thanks for paying up, CHUMP!', 1, pygame.Color("black"))
