@@ -7,11 +7,12 @@ import struct
 
 WIDTH = 1024
 HEIGHT = 600
-running = 1
-bgcolor = 0, 0, 0
-fontcolor = 255, 255, 255
-YELLOW = 255, 255, 0
+running = 1 #just to make the while loop look cool 
+bgcolor = 0, 0, 0 #aka the color black
+fontcolor = 255, 255, 255 #aka the color white
+YELLOW = 255, 255, 0 #here are your basic primary colors
 RED = 255, 0, 0
+BLUE = 0, 0, 255
 BLINK_EVENT = pygame.USEREVENT + 0 #For the blinking "insert credits"
 CREDITS_EVENT = pygame.USEREVENT + 1 #doesn't really serve a purpose atm...
 
@@ -26,6 +27,73 @@ def changeBlink():
 def getBlink():
     global keepBlinking
     return keepBlinking
+
+def gameplay():
+    print("at gameplay!")
+    scoreValue = 0
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT)) #Setting the screen parameters 
+    screen_rect = screen.get_rect()
+
+    background = pygame.Surface(screen.get_size()) #Filling up the background 
+    background = background.convert()
+    background.fill(bgcolor)
+    
+    #Text Display
+    title = pygame.font.Font(None, 70)
+    gameover = pygame.font.Font(None, 100)
+    text1 = title.render('GAME TIME!', 1, RED)
+
+    background = pygame.Surface(screen.get_size()) #Filling up the background 
+
+    textpos1 = text1.get_rect(center=(0, 70))
+    textpos1.centerx = background.get_rect().centerx
+
+    score = pygame.font.Font(None, 200)
+    scoreNum = score.render(str(scoreValue), 1, fontcolor)
+    scorepos = scoreNum.get_rect(center=(0, (HEIGHT/2)))
+    scorepos.centerx = background.get_rect().centerx
+
+    #circle_rect = Rect(410, 200, 200, 200)
+    #pygame.draw.ellipse(background, fontcolor, circle_rect)
+    #Blit everything, i.e. makes everything appear
+    background.blit(text1, textpos1)
+    background.blit(scoreNum, scorepos)
+    screen.blit(background, (0,0))
+
+    gameOver = False
+    while not(gameOver): #as of now, score updates because of time, implementation of scoring to come
+        pygame.display.flip()
+        screen.fill(bgcolor) #"Erases" old score every time to make way for the new one
+        text1 = title.render('GAME TIME!', 1, RED)
+        scoreNum = score.render(str(scoreValue), 1, fontcolor)
+        scorepos = scoreNum.get_rect(center=(0, (HEIGHT/2)))
+        scorepos.centerx = background.get_rect().centerx
+        screen.blit(text1, textpos1)
+        screen.blit(scoreNum, scorepos)
+        scoreValue+=1
+        time.sleep(.1)
+
+        #Find a condition for ending the game, for now we'll use this 
+        if scoreValue >= 10:
+            gameOver = True
+            pygame.display.flip()
+            screen.fill(bgcolor)
+            text2 = gameover.render('GAME OVER', 1, RED)
+            textpos2 = text2.get_rect(center=(0, (HEIGHT/2)))
+            textpos2.centerx = background.get_rect().centerx
+            maxscore = title.render('Your score: ' + str(scoreValue), 1, fontcolor)
+            maxscorepos = maxscore.get_rect(center=(0, (HEIGHT/2 + 70)))
+            maxscorepos.centerx = background.get_rect().centerx
+            screen.blit(text2, textpos2)
+            screen.blit(maxscore, maxscorepos)
+        
+    #What will be written here is how the program will deal with the raspberry pi
+    #i.e. how points will be assigned based on sensor values and whatnot
+    #store the point stuff in a variable and increment it once in a while
+    #perhaps implement another method in order to keep track of points and stuff and loop
+    #dunno about  stopping  condition....lol
+    #how long does gameplay last? how to determine how to get back to the main page?
 
 
 def main():
@@ -65,17 +133,12 @@ def main():
     blink_surface = next(blink_surfaces)
     pygame.time.set_timer(BLINK_EVENT, 500)
         
-        
     #Blit everything, i.e. makes everything appear
     background.blit(text1, textpos1)
     background.blit(text2, textpos2)
     screen.blit(background, (0,0))
 
-    #If you want to have a circle in the middle of the screen
-    #circle_rect = Rect(410, 200, 200, 200)
-    #pygame.draw.ellipse(screen, fontcolor, circle_rect)
     pygame.display.flip()
-
 
     credit=0
     arduino = serial.Serial('COM3', 9600, timeout=.1)
@@ -90,23 +153,22 @@ def main():
                 waitingForAOne = False
                 my_event = pygame.event.Event(CREDITS_EVENT, message="credits inserted")
                 pygame.event.post(my_event)
+                #arduino.close() #closing the port
         except:
-            pass #can't think of anything better, ayy lmao
+            pass #can't think of anything better at the moment
             #my_event = pygame.event.Event(BLINK_EVENT, message="idk!")
             #pygame.event.post(my_event) #is this even necessary...nobody knowsss
-
-
     
     while running: 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONUP: #this is all for shits and giggles 
+            if event.type == pygame.MOUSEBUTTONUP: #find a better way for transitioning to gameplay 
                 screen.fill(pygame.Color("black"))
                 on_text_surface = font.render('Thanks for paying up, CHUMP!', 1, pygame.Color("black"))
                 changeBlink() #By clicking multiple times, one can toggle blinking on and off
-                #gamePlay(), this should start the actual game
+                gameplay() #this should start the actual game
             if event.type == BLINK_EVENT:
                 if getBlink():
                     blink_surface = next(blink_surfaces)
@@ -114,7 +176,7 @@ def main():
                 else:
                     pass
                 
-            if event.type == CREDITS_EVENT: #dont think we rlly need this
+            if event.type == CREDITS_EVENT: #dont think we rlly need this, kinda useless
                 print("yay credits")
             #if event.type == GAMEOVER_EVENT:
                 #pass #Game over, display high scores?
