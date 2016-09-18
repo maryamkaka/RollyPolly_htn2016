@@ -75,7 +75,7 @@ def gameplay():
             points = int(struct.unpack('s', arduinoRead)[0])
             if points == 2:
                 scoreValue += 42
-            elif points == 1:
+            elif points == 1 and scoreValue > 0:
                 gameOver = True
         except:
             pass
@@ -87,12 +87,18 @@ def gameplay():
         scorepos.centerx = background.get_rect().centerx
         screen.blit(text1, textpos1)
         screen.blit(scoreNum, scorepos)
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.display.quit()
+                    pygame.quit()
+                    sys.exit()
         
         time.sleep(.1)
         
     #Find a condition for ending the game, for now we'll use this 
     if gameOver:
-        while count<2500: #count is employed so that the game over screen remains for a bit
+        while count<2000: #count is employed so that the game over screen remains for a bit
             scores.append(scoreValue)
             gameOver = True
             pygame.display.flip()
@@ -110,6 +116,12 @@ def gameplay():
             screen.blit(userscore, userscorepos)
             screen.blit(maxscore, maxscorepos)
             count += 1
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        pygame.display.quit()
+                        pygame.quit()
+                        sys.exit()
 
     my_event = pygame.event.Event(RESET_EVENT, message="reset!")
     pygame.event.post(my_event)
@@ -180,10 +192,12 @@ def main():
     while running: 
         for event in pygame.event.get():
             if event.type == QUIT:
+                pygame.display.quit()
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
+                    pygame.display.quit()
                     pygame.quit()
                     sys.exit()
             if event.type == pygame.MOUSEBUTTONUP: #this is all for shits and giggles 
