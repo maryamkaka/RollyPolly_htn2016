@@ -5,16 +5,21 @@ from itertools import cycle
 import time
 import struct
 
+#Some colors, for simplicity
+BLACK = 0, 0, 0 #aka the color black
+WHITE = 255, 255, 255 #aka the color white
+YELLOW = 255, 255, 0 #here are your basic primary colors
+RED = 255, 0, 0
+GREEN = 0, 255, 0
+
 WIDTH = 1024
 HEIGHT = 600
 running = 1 #just to make the while loop look cool 
-bgcolor = 0, 0, 0 #aka the color black
-fontcolor = 255, 255, 255 #aka the color white
-YELLOW = 255, 255, 0 #here are your basic primary colors
-RED = 255, 0, 0
-BLUE = 0, 0, 255
+
 BLINK_EVENT = pygame.USEREVENT + 0 #For the blinking "insert credits"
-CREDITS_EVENT = pygame.USEREVENT + 1 #doesn't really serve a purpose atm...
+
+#Keeping track of highscores 
+scores = [46,23,6,87,9,7,57,87,20]
 
 #The following is to disable and enable blinking after a click (or whatever action)
 keepBlinking = True
@@ -37,7 +42,7 @@ def gameplay():
 
     background = pygame.Surface(screen.get_size()) #Filling up the background 
     background = background.convert()
-    background.fill(bgcolor)
+    background.fill(BLACK)
     
     #Text Display
     title = pygame.font.Font(None, 70)
@@ -50,12 +55,12 @@ def gameplay():
     textpos1.centerx = background.get_rect().centerx
 
     score = pygame.font.Font(None, 200)
-    scoreNum = score.render(str(scoreValue), 1, fontcolor)
+    scoreNum = score.render(str(scoreValue), 1, WHITE)
     scorepos = scoreNum.get_rect(center=(0, (HEIGHT/2)))
     scorepos.centerx = background.get_rect().centerx
 
     #circle_rect = Rect(410, 200, 200, 200)
-    #pygame.draw.ellipse(background, fontcolor, circle_rect)
+    #pygame.draw.ellipse(background, WHITE, circle_rect)
     #Blit everything, i.e. makes everything appear
     background.blit(text1, textpos1)
     background.blit(scoreNum, scorepos)
@@ -64,25 +69,25 @@ def gameplay():
     gameOver = False
     while not(gameOver): #as of now, score updates because of time, implementation of scoring to come
         pygame.display.flip()
-        screen.fill(bgcolor) #"Erases" old score every time to make way for the new one
+        screen.fill(BLACK) #"Erases" old score every time to make way for the new one
         text1 = title.render('GAME TIME!', 1, RED)
-        scoreNum = score.render(str(scoreValue), 1, fontcolor)
+        scoreNum = score.render(str(scoreValue), 1, WHITE)
         scorepos = scoreNum.get_rect(center=(0, (HEIGHT/2)))
         scorepos.centerx = background.get_rect().centerx
         screen.blit(text1, textpos1)
         screen.blit(scoreNum, scorepos)
         scoreValue+=1
         time.sleep(.1)
-
+        
         #Find a condition for ending the game, for now we'll use this 
         if scoreValue >= 10:
             gameOver = True
             pygame.display.flip()
-            screen.fill(bgcolor)
+            screen.fill(BLACK)
             text2 = gameover.render('GAME OVER', 1, RED)
             textpos2 = text2.get_rect(center=(0, (HEIGHT/2)))
             textpos2.centerx = background.get_rect().centerx
-            maxscore = title.render('Your score: ' + str(scoreValue), 1, fontcolor)
+            maxscore = title.render('Your score: ' + str(scoreValue), 1, WHITE)
             maxscorepos = maxscore.get_rect(center=(0, (HEIGHT/2 + 70)))
             maxscorepos.centerx = background.get_rect().centerx
             screen.blit(text2, textpos2)
@@ -94,7 +99,7 @@ def gameplay():
     #perhaps implement another method in order to keep track of points and stuff and loop
     #dunno about  stopping  condition....lol
     #how long does gameplay last? how to determine how to get back to the main page?
-
+    #End condition: NO MORE BALLS, add score to highscore list 
 
 def main():
     pygame.init()
@@ -104,7 +109,7 @@ def main():
 
     background = pygame.Surface(screen.get_size()) #Filling up the background 
     background = background.convert()
-    background.fill(bgcolor)
+    background.fill(BLACK)
 
     waitingForAOne = True  
     
@@ -113,7 +118,7 @@ def main():
     subtitle = pygame.font.Font(None, 36)
     font = pygame.font.Font(None, 36)
     text1 = title.render('PINBALL!', 1, YELLOW)
-    text2 = subtitle.render('Insert an AMERICAN quarter to begin', 1, fontcolor)
+    text2 = subtitle.render('Insert an AMERICAN quarter to begin', 1, WHITE)
 
     #Setting the title at the top of the page
     textpos1 = text1.get_rect(center=(0, 100))
@@ -151,20 +156,16 @@ def main():
             if credit==1:
                 print("thank you for inserting a coin!") #FOR DEBUGGING PURPOSES
                 waitingForAOne = False
-                my_event = pygame.event.Event(CREDITS_EVENT, message="credits inserted")
-                pygame.event.post(my_event)
                 #arduino.close() #closing the port
         except:
-            pass #can't think of anything better at the moment
-            #my_event = pygame.event.Event(BLINK_EVENT, message="idk!")
-            #pygame.event.post(my_event) #is this even necessary...nobody knowsss
+            pass #can't think of anything better
     
     while running: 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONUP: #find a better way for transitioning to gameplay 
+            if event.type == pygame.MOUSEBUTTONUP: #this is all for shits and giggles 
                 screen.fill(pygame.Color("black"))
                 on_text_surface = font.render('Thanks for paying up, CHUMP!', 1, pygame.Color("black"))
                 changeBlink() #By clicking multiple times, one can toggle blinking on and off
@@ -175,12 +176,6 @@ def main():
                     screen.blit(blink_surface, blink_rect)
                 else:
                     pass
-                
-            if event.type == CREDITS_EVENT: #dont think we rlly need this, kinda useless
-                print("yay credits")
-            #if event.type == GAMEOVER_EVENT:
-                #pass #Game over, display high scores?
-            #if event.type == RESTART_EVENT:
             if event.type == pygame.KEYDOWN: #pressing R restarts the process
                 if event.key == pygame.K_r: #Can change to whatever condition
                     if getBlink() == False:
