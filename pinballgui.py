@@ -12,8 +12,8 @@ YELLOW = 255, 255, 0 #here are your basic primary colors
 RED = 255, 0, 0
 GREEN = 0, 255, 0
 
-WIDTH = 1024
-HEIGHT = 600
+WIDTH = 824
+HEIGHT = 500
 running = 1 #just to make the while loop look cool 
 
 BLINK_EVENT = pygame.USEREVENT + 0 #For the blinking "insert credits"
