@@ -12,8 +12,8 @@ YELLOW = 255, 255, 0 #here are your basic primary colors
 RED = 255, 0, 0
 GREEN = 0, 255, 0
 
-WIDTH = 824
-HEIGHT = 500
+WIDTH = 640
+HEIGHT = 480
 running = 1 #just to make the while loop look cool 
 
 BLINK_EVENT = pygame.USEREVENT + 0 #For the blinking "insert credits"
@@ -38,7 +38,7 @@ def gameplay():
     scoreValue = 0
     count = 0
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT)) #Setting the screen parameters 
+    screen = pygame.display.set_mode((640,480), pygame.FULLSCREEN) #Setting the screen parameters 
     screen_rect = screen.get_rect()
 
     background = pygame.Surface(screen.get_size()) #Filling up the background 
