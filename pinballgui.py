@@ -75,6 +75,8 @@ def gameplay():
             points = int(struct.unpack('s', arduinoRead)[0])
             if points==2:
                 scoreValue += 42
+            elif points==1:
+                gameOver = True
         except:
             pass
         pygame.display.flip()
@@ -89,7 +91,7 @@ def gameplay():
         time.sleep(.1)
         
         #Find a condition for ending the game, for now we'll use this 
-        if scoreValue >= 500:
+        if gameOver:
             while count<2500: #count is employed so that the game over screen remains for a bit
                 scores.append(scoreValue)
                 gameOver = True
