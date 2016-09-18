@@ -1,6 +1,6 @@
-const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
+const int rightBumper = A0;  // Analog input pin that the potentiometer is attached to
 
-int sensorValue = 1023;        // value read from the pot
+int rightBumperValue = 1023;        // value read from the pot
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -10,9 +10,9 @@ void setup() {
 void loop() {
   delay(100);
   
-  sensorValue = analogRead(analogInPin);
-
-  if(sensorValue < 950){
-    Serial.print("1 \n");
+  rightBumperValue = analogRead(rightBumper);
+  
+  if(rightBumperValue < 950){
+    Serial.print("rightBumper \n");
   }
 }
