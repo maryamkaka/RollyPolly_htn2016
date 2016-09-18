@@ -21,7 +21,7 @@ void loop() {
   startSig = analogRead(startButton);
   
   if(rightBumperValue < maxValue || leftBumperValue < maxValue){
-    Serial.print("bumper \n");
+    Serial.print("2 \n");
   }
   
   if(startSig == 0){
